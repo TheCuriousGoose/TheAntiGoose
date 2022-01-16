@@ -1,5 +1,6 @@
 const Discord = require("discord.js");
 const MessageAI = require("messageai.js")
+const colors = require('colors');
 
 const client = new Discord.Client();
 const config = require("./config.json");
@@ -10,6 +11,17 @@ client.on("message", message => {
   message.channel.send(MessageAI.getrespond(message))
 })
 
+fs.readdir("./commands/", (err, files) => {
+  if (err) return console.error(err);
+  files.forEach(file => {
+    if (!file.endsWith(".js")) return;
+    let props = require(`./commands/${file}`);
+    let commandName = file.split(".")[0];
+    console.log(colors.gray(`Loading command ${commandName}`));
+    client.commands.set(commandName, props);
+  });
+  console.log(colors.green(`Done loading in ${files.length} commands`));
+});
 
 client.on('guildMemberAdd', member => {
     if(member.bot) return;
@@ -20,9 +32,6 @@ client.on('guildMemberAdd', member => {
   
     channel.send(`Welcome ${member} ${randomjoin[Math.floor(Math.random() * randomjoin.length)]}`);
     return;
-  }
-    return;
-    }
 });
 
 client.on("ready", () => {
